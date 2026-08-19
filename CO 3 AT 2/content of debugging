@@ -1,0 +1,34 @@
+To identify which capacitor is responsible for the increase in the lower cut-off frequency, we need to calculate the individual lower cut-off frequencies contributed by each of the three capacitors ($C_1$, $C_2$, and $C_E$). 
+The capacitor that creates the highest individual cut-off frequency dominates and determines the overall lower cut-off frequency ($f_L$) of the amplifier. 
+1. DC and Small-Signal Parameters 
+First, let's find the equivalent base biasing resistance ($R_{th}$) and the transistor's small-signal input resistance ($r_\pi$). 
+
+• Thevenin Base Resistance (R_{th}): $R_{th} = 68\text{ k}\Omega \parallel 22\text{ k}\Omega = \frac{68 \times 22}{68 + 22} \approx 16.62\text{ k}\Omega$ 
+• Approximate DC Bias Check: $V_{th} = 10\text{ V} \times \frac{22\text{ k}\Omega}{68\text{ k}\Omega + 22\text{ k}\Omega} \approx 2.44\text{ V}$ $I_C \approx I_E = \frac{V_{th} - V_{BE}}{R_E + \frac{R_{th}}{\beta + 1}} = \frac{2.44\text{ V} - 0.7\text{ V}}{1\text{ k}\Omega + \frac{16.62\text{ k}\Omega}{101}} \approx \frac{1.74\text{ V}}{1.165\text{ k}\Omega} \approx 1.49\text{ mA}$ 
+• Transistor Small-Signal Resistance (r_\pi): $g_m = \frac{I_C}{V_T} = \frac{1.49\text{ mA}}{26\text{ mV}} \approx 57.3\text{ mS}$ $r_\pi = \frac{\beta}{g_m} = \frac{100}{57.3\text{ mS}} \approx 1.75\text{ k}\Omega$ 
+
+2. Low-Frequency Response Analysis 
+Case A: Cut-off Frequency due to Input Coupling Capacitor ($C_1$) The total resistance seen by $C_1$ is the source resistance ($R_s = 680\ \Omega$) plus the input resistance of the amplifier stage ($R_{in} = R_{th} \parallel r_\pi$). $R_{in} = 16.62\text{ k}\Omega \parallel 1.75\text{ k}\Omega \approx 1.58\text{ k}\Omega$ $R_{C1} = R_s + R_{in} = 680\ \Omega + 1580\ \Omega = 2260\ \Omega$ 
+$f_{L1} = \frac{1}{2\pi R_{C1} C_1} = \frac{1}{2\pi \times 2260\ \Omega \times 0.1\mu\text{F}} \approx 704\text{ Hz}$ 
+Case B: Cut-off Frequency due to Output Coupling Capacitor ($C_2$) The resistance seen by $C_2$ is the collector resistance ($R_C$) plus the load resistance ($R_L$). $R_{C2} = R_C + R_L = 2.2\text{ k}\Omega + 10\text{ k}\Omega = 12.2\text{ k}\Omega$ 
+$f_{L2} = \frac{1}{2\pi R_{C2} C_2} = \frac{1}{2\pi \times 12.2\text{ k}\Omega \times 0.1\mu\text{F}} \approx 130\text{ Hz}$ 
+Case C: Cut-off Frequency due to Emitter Bypass Capacitor ($C_E$) The resistance seen looking into the emitter network ($R_{CE}$) is $R_E$ in parallel with the impedance looking back into the emitter terminal. $R_e' = \frac{r_\pi + (R_{th} \parallel R_s)}{\beta + 1}$ $R_{th} \parallel R_s = 16.62\text{ k}\Omega \parallel 680\ \Omega \approx 653\ \Omega$ $R_e' = \frac{1750\ \Omega + 653\ \Omega}{101} \approx 23.8\ \Omega$ $R_{CE} = R_E \parallel R_e' = 1\text{ k}\Omega \parallel 23.8\ \Omega \approx 23.2\ \Omega$ 
+$f_{LE} = \frac{1}{2\pi R_{CE} C_E} = \frac{1}{2\pi \times 23.2\ \Omega \times 10\mu\text{F}} \approx 686\text{ Hz}$ 
+3. Conclusion & Identification 
+
+• Expected System Behavior: Ideally, the lower cut-off frequencies are designed such that the dominant poles interact to yield the expected $350\text{ Hz}$ response overall. 
+• Analysis of the 720\text{ Hz} Error: The calculated theoretical pole for the input capacitor ($f_{L1} \approx 704\text{ Hz}$) is extremely close to the observed experimental error value of $720\text{ Hz}$. This indicates that $C_1$ is acting alone as a heavily dominant pole instead of blending smoothly with the other poles at a lower frequency. 
+
+Most Likely Responsible Component: Capacitor C_1 (Input coupling capacitor). 
+If its actual component value has degraded (decreased below $0.1\mu\text{F}$) due to tolerances or faults, it will directly shift the lower cut-off frequency higher towards the measured $720\text{ Hz}$ mark. 
+4. LTspice Verification Strategy 
+To verify this analysis via LTspice schematic simulation: 
+
+1. Build the Circuit: Draw the schematic using standard NPN components ($2\text{N}2222$ or an ideal model with $\beta=100$). 
+2. Setup AC Sweep: Go to  to test frequencies from $1\text{ Hz}$ to $100\text{ kHz}$. 
+3. Locate f_L: Plot the voltage gain magnitude at $V_{out}/V_{in}$, find the mid-band peak value, and step down by $-3\text{ dB}$. 
+4. Isolate C_1: Change $C_1$ to a much larger value (e.g., $10\mu\text{F}$). If the cut-off frequency drops dramatically near the target values, it conclusively proves $C_1$ was the root limiting element. 
+
+If you'd like, I can help you with modifying the resistor values to fix the issue or calculating the exact component value change needed for $C_1$ to bring the cut-off frequency back to $350\text{ Hz}$. 
+
+AI responses may include mistakes.
